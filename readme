@@ -1,0 +1,5 @@
+1. install all dependencies -> npm install
+2. You need to ask me for username and password to connect to DB.
+3. You must give me your Ip address to give you Network access to DB.
+4. Enter credentials 
+5. enter -> npm start
