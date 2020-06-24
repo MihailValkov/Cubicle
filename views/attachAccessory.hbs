@@ -1,10 +1,10 @@
 <main>
   <h1>Attach a new accessory</h1>
   <div class="form">
-    <h2>{{cubeName}}</h2>
-    <img class="cube" src="{{cubeImageUrl}}">
+    <h2>{{name}}</h2>
+    <img class="cube" src="{{imageUrl}}">
     {{#if accessories}}
-    <form action='/attach/accessory/{{cubeId}}' method="POST">
+    <form action='/attach/accessory/{{_id}}' method="POST">
       <label for="accessory">Accessories</label>
       <select id="accessory" name="accessory">
         {{#each accessories}}

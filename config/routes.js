@@ -2,12 +2,13 @@ const controllerCub = require('../controllers/cubs');
 const controllerUser = require('../controllers/user');
 
 module.exports = (app) => {
-    app.get('/',controllerUser.auth, controllerCub.getCubes)
+    app.get('/', controllerUser.auth,controllerCub.getCubes)
     app.get('/register',controllerUser.getRegister )
     app.post('/register',controllerUser.postRegister )
     app.get('/login',controllerUser.getLogin )
     app.post('/login',controllerUser.postLogin )
-    app.get('/create',controllerUser.auth,controllerUser.auth,controllerCub.getCreate )
+    app.get('/logout',controllerUser.logout )
+    app.get('/create',controllerUser.auth,controllerCub.getCreate )
     app.post('/create',controllerUser.auth,controllerCub.postCreate )
     app.get('/about', controllerCub.getAbout)
     app.get('/details/:id', controllerCub.getDetails)
