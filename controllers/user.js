@@ -44,15 +44,22 @@ async function postLogin(req, res) {
 
 function auth(req,res,next){
     const token = req.cookies['auth-user'];
-    if(!token) {
+    if(token) {
+      const user = jwt.verify(token,process.env.PRIVATE_KEY);
+      if(!user) {
+          return res.redirect('/login')
+      }
+         req.user=user;
          return next();
      }
-     const user = jwt.verify(token,process.env.PRIVATE_KEY);
-     if(!user) {
-         return res.redirect('/login')
+     if (!token && req.path==='/'){
+       return next()
      }
-        req.user=user;
-        next();
+     return res.redirect('/login')
+}
+function logout(req, res) {
+  res.clearCookie('auth-user');
+  return res.status(200).redirect('/');
 }
 
 module.exports = {
@@ -60,5 +67,6 @@ module.exports = {
   getRegister,
   getLogin,
   postLogin,
-  auth
+  auth,
+  logout
 };

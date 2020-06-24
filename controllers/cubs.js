@@ -1,6 +1,14 @@
 
 const CubeModel = require('../models/db_cube');
 const AccessoryModel = require('../models/db_accessory');
+const isAuthUser = (req,res,page,cubes)=> {
+    const isAuth=!!req.user;
+    if(isAuth) {
+        const username=req.user.username;
+        return res.render(page, {...cubes ,isAuth,username} )
+    }
+    res.render(page, {...cubes} )
+}
 async function getCubes (req,res,next) {
     try {
         let {search, from, to} = req.query ;
@@ -10,8 +18,8 @@ async function getCubes (req,res,next) {
         } else {
             cubes = await CubeModel.find({}).lean();
         }
-        let isAuth=!!req.user;
-        res.render('index.hbs', {cubes ,isAuth,username:req.user.username} )
+        await isAuthUser(req,res,'index.hbs',{cubes})
+
     } catch (error) {
         next(error)
     }
@@ -19,7 +27,8 @@ async function getCubes (req,res,next) {
 }
 
 function getCreate (req,res,next) {
-    res.render('create.hbs')
+    isAuthUser(req,res,'create.hbs')
+
 }
 function postCreate (req,res,next) {  
 const {name ,description,imageUrl,difficultyLevel} = req.body;
@@ -29,7 +38,7 @@ new CubeModel({name ,description,imageUrl,difficultyLevel}).save()
     
 }
 function getAbout(req,res) {
-    res.render('about.hbs')
+    isAuthUser(req,res,'about.hbs')
 }
 function getDetails (req,res,next) {
     const id = req.params.id;
@@ -39,7 +48,7 @@ function getDetails (req,res,next) {
     }).catch(next)
 }
 function errorHandler (req,res) {
-    res.render('404.hbs')
+    isAuthUser(req,res,'404.hbs')
 }
 function getDelete (req,res,next) {
     const id = req.params.id;
@@ -49,8 +58,8 @@ function getDelete (req,res,next) {
 }
 function getUpdate (req,res,next) {
     const id = req.params.id;
-    CubeModel.findById(id).then(cube=> {
-        res.render('update.hbs', cube)
+    CubeModel.findById(id).lean().then(cube=> {
+        isAuthUser(req,res,'update.hbs',cube)
     })
     .catch(next)
 }
@@ -61,11 +70,9 @@ function postUpdate(req,res,next) {
 }
 function getAttachAccessory (req,res,next) {
     const id= req.params.id;
-    Promise.all([CubeModel.findById(id),AccessoryModel.find({cubes :{ $nin : id }})])
+    Promise.all([CubeModel.findById(id).lean(),AccessoryModel.find({cubes :{ $nin : id }}).lean()])
     .then(([cube,accessories])=> {
-        accessories = accessories.map(x=> x = {id :x.id, name :x.name})
-        res.render('attachAccessory.hbs',{cubeName:cube.name,cubeImageUrl :cube.imageUrl,cubeId :cube.id,accessories})
-
+        isAuthUser(req,res,'attachAccessory.hbs',{...cube,accessories})
     })
 }
 function postAttachAccessory (req,res,next) {
@@ -77,7 +84,7 @@ function postAttachAccessory (req,res,next) {
 }
 
 function getCreateAccessory(req,res,next){
-    res.render('createAccessory.hbs')
+    isAuthUser(req,res,'createAccessory.hbs')
 }
 function postCreateAccessory(req,res,next){
     const data= req.body;
