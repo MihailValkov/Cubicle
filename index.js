@@ -1,4 +1,5 @@
-const env = process.env.NODE_ENV || 'development';
+require('dotenv').config()
+const env = process.env.NODE_ENV;
 global.__basedir = __dirname;
 const mongoose = require('mongoose')
 

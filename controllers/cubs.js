@@ -10,7 +10,8 @@ async function getCubes (req,res,next) {
         } else {
             cubes = await CubeModel.find({}).lean();
         }
-        res.render('index.hbs', {cubes})
+        let isAuth=!!req.user;
+        res.render('index.hbs', {cubes ,isAuth,username:req.user.username} )
     } catch (error) {
         next(error)
     }

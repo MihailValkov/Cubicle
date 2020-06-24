@@ -1,5 +1,6 @@
 const UserModel = require("../models/db_user");
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 
 async function postRegister(req, res, next) {
   const { username, password, repeatPassword } = req.body;
@@ -21,10 +22,43 @@ async function postRegister(req, res, next) {
 }
 
 function getRegister(req, res) {
-  res.render("register.hbs");
+    res.render("register.hbs");
+  }
+function getLogin(req, res) {
+    res.render("login.hbs");
+  }
+async function postLogin(req, res) {
+    const {username,password}= req.body;
+    try {
+        const user= await UserModel.findOne({username});
+        if(!user) { throw new Error('User is not found!')}
+        const match = await bcrypt.compare(password,user.password);
+        if(!match) { throw new Error('Password is wrong!')}
+        const token = jwt.sign({username ,id:user._id},process.env.PRIVATE_KEY);
+        res.cookie('auth-user',token);
+        return res.redirect('/');
+    } catch (error) {
+        res.redirect('/login');
+  }
+}
+
+function auth(req,res,next){
+    const token = req.cookies['auth-user'];
+    if(!token) {
+         return next();
+     }
+     const user = jwt.verify(token,process.env.PRIVATE_KEY);
+     if(!user) {
+         return res.redirect('/login')
+     }
+        req.user=user;
+        next();
 }
 
 module.exports = {
   postRegister,
   getRegister,
+  getLogin,
+  postLogin,
+  auth
 };
