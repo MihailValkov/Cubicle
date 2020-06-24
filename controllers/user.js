@@ -52,7 +52,7 @@ function auth(req,res,next){
          req.user=user;
          return next();
      }
-     if (!token && req.path==='/'){
+     if (!token && (req.path==='/' || req.path===`/details/${req.params.id}`)){
        return next()
      }
      return res.redirect('/login')
