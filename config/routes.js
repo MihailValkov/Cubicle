@@ -11,7 +11,7 @@ module.exports = (app) => {
     app.get('/create',controllerUser.auth,controllerCub.getCreate )
     app.post('/create',controllerUser.auth,controllerCub.postCreate )
     app.get('/about', controllerCub.getAbout)
-    app.get('/details/:id', controllerCub.getDetails)
+    app.get('/details/:id',controllerUser.auth, controllerCub.getDetails)
     app.get('/delete/:id', controllerUser.auth,controllerCub.getDelete)
     app.get('/update/:id',controllerUser.auth, controllerCub.getUpdate)
     app.post('/update/:id',controllerUser.auth, controllerCub.postUpdate)
