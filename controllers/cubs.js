@@ -31,7 +31,7 @@ function getCreate(req, res, next) {
 }
 function postCreate(req, res, next) {
   const { name, description, imageUrl, difficultyLevel } = req.body;
-  new CubeModel({ name, description, imageUrl, difficultyLevel })
+  new CubeModel({ name, description, imageUrl, difficultyLevel, creator:req.user.id })
     .save()
     .then(() => res.redirect("/"))
     .catch(next);
@@ -45,10 +45,12 @@ function getDetails(req, res, next) {
     .lean()
     .populate("accessories")
     .then((cube) => {
+        const isCreator = cube.creator === req.user.id;
       isAuthUser(req, res, "details.hbs", {
         id: cube._id,
         ...cube,
         accessories: cube.accessories,
+        isCreator
       });
     })
     .catch(next);
