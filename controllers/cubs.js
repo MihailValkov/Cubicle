@@ -45,8 +45,6 @@ function getDetails(req, res, next) {
     .lean()
     .populate("accessories")
     .then((cube) => {
-      // const accessories = cube.accessories.map(x=> x= {imageUrl : x.imageUrl, description:x.description ,name :x.name});
-      // res.render('details.hbs',{name:cube.name, description :cube.description, imageUrl:cube.imageUrl, difficultyLevel : cube.difficultyLevel,id :cube._id,accessories})
       isAuthUser(req, res, "details.hbs", {
         id: cube._id,
         ...cube,
@@ -74,10 +72,11 @@ function getUpdate(req, res, next) {
         const options = [{1:"1 - Very Easy"},{2:"2 - Easy"},{3:"3 - Medium (Standard 3x3)"},
             {4:"4 - Intermediate"},{5:"5 - Expert"},{6:"6 - Hardcore"}]
             .map(x=> {
-            if (x[cube.difficultyLevel]){
-               return x= {info :Object.values(x)[0] , selected :true}
+                x= {value: Object.keys(x)[0], info :Object.values(x)[0]}
+            if (+x.value === +cube.difficultyLevel){
+               x.selected =true;
             }
-            return x= {info :Object.values(x)[0]}
+            return x
         })
       isAuthUser(req, res, "update.hbs", { ...cube,options });
     })
