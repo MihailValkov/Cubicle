@@ -14,7 +14,7 @@ async function getCubes(req, res, next) {
     let cubes;
     if ((search, from, to)) {
       cubes = await CubeModel.find({
-        name: new RegExp("^" + search + "$", "i"),
+        name: new RegExp(search, "i"),
         difficultyLevel: { $gte: from, $lte: to },
       }).lean();
     } else {
