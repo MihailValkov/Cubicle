@@ -1,11 +1,11 @@
 {
-    "name": "Cubicle Workshop",
+    "name": "Cubicle-Workshop",
     "description": "description",
     "authors": "Mihail",
     "version": "1.0.0",
-    "main": "pathToMain",
+    "main": "index.js",
     "scripts": {
-        "start": "nodemon ."
+        "start": "nodemon index.js"
     },
     "dependencies": {
         "bcrypt": "^5.0.0",
@@ -15,9 +15,9 @@
         "express": "^4.17.1",
         "express-handlebars": "^3.1.0",
         "jsonwebtoken": "^8.5.1",
-        "mongoose": "^5.9.19"
+        "mongoose": "^5.9.20"
     },
     "devDependencies": {
-        "nodemon": "^1.19.2"
+        "nodemon": "^1.19.4"
     }
 }
