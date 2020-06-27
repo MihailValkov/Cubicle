@@ -1,23 +1,20 @@
 const UserModel = require("../models/db_user");
-const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
-async function postRegister(req, res, next) {
+async function postRegister(req, res) {
   const { username, password, repeatPassword } = req.body;
   try {
     if (password !== repeatPassword) {
-      throw Error();
+      throw new Error("Password and repeat password don't match");
     }
     const user = await UserModel.findOne({ username });
-    if (!user) {
-      const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(password, salt);
-      new UserModel({ username, password: hash }).save();
-
+    if (user) {throw new Error("Username is already taken!");}
+      await UserModel.create({ username, password})
       return res.redirect("/login");
-    }
   } catch (error) {
-    res.redirect("/register");
+    const message= (error.message.split(':')[error.message.split(':').length-1]).includes('Path') ? "Please fill all fields!" :
+    error.message.split(':')[error.message.split(':').length-1];
+    res.render("register.hbs",{message});
   }
 }
 
@@ -31,14 +28,13 @@ async function postLogin(req, res) {
     const {username,password}= req.body;
     try {
         const user= await UserModel.findOne({username});
-        if(!user) { throw new Error('User is not found!')}
-        const match = await bcrypt.compare(password,user.password);
-        if(!match) { throw new Error('Password is wrong!')}
+        if(!user) { throw new Error('Username or password is wrong!')}
+        const match = await user.matchPassword(password,user.password)
+        if(!match) { throw new Error('Username or password is wrong!')}
         const token = jwt.sign({username ,id:user._id},process.env.PRIVATE_KEY);
-        res.cookie('auth-user',token);
-        return res.redirect('/');
+        res.cookie('auth-user',token).redirect('/');
     } catch (error) {
-        res.redirect('/login');
+        res.render('login.hbs',{message:error.message});
   }
 }
 
