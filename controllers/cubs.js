@@ -34,7 +34,12 @@ function postCreate(req, res, next) {
   new CubeModel({ name, description, imageUrl, difficultyLevel, creator:req.user.id })
     .save()
     .then(() => res.redirect("/"))
-    .catch(next);
+    .catch(error=> {
+      const message= error.message.includes('Path') ? "Please fill all fields!" :
+      error.message.split(': ')[error.message.split(': ').length-1];
+      const isAuth =  !!req.user
+      res.render('create.hbs',{...req.body,isAuth,username:req.user.username,message})
+    });
 }
 function getAbout(req, res) {
   isAuthUser(req, res, "about.hbs");
@@ -71,24 +76,36 @@ function getUpdate(req, res, next) {
   CubeModel.findById(id)
     .lean()
     .then((cube) => {
-        const options = [{1:"1 - Very Easy"},{2:"2 - Easy"},{3:"3 - Medium (Standard 3x3)"},
-            {4:"4 - Intermediate"},{5:"5 - Expert"},{6:"6 - Hardcore"}]
-            .map(x=> {
-                x= {value: Object.keys(x)[0], info :Object.values(x)[0]}
-            if (+x.value === +cube.difficultyLevel){
-               x.selected =true;
-            }
-            return x
-        })
+      const {difficultyLevel} = cube;
+      const options = selectOptionsRender(difficultyLevel)
       isAuthUser(req, res, "update.hbs", { ...cube,options });
     })
     .catch(next);
 }
+function selectOptionsRender(difficultyLevel) {
+  return [{ 1: "1 - Very Easy" }, { 2: "2 - Easy" }, { 3: "3 - Medium (Standard 3x3)" },
+  { 4: "4 - Intermediate" }, { 5: "5 - Expert" }, { 6: "6 - Hardcore" }]
+    .map(x => {
+      x = { value: Object.keys(x)[0], info: Object.values(x)[0] };
+      if (+x.value === +difficultyLevel) {
+        x.selected = true;
+      }
+      return x;
+    });
+}
+
 function postUpdate(req, res, next) {
   const id = req.params.id;
-  CubeModel.findByIdAndUpdate(id, { ...req.body })
+  CubeModel.findByIdAndUpdate(id, { ...req.body }, {runValidators:true})
     .then(() => res.redirect(`/details/${id}`))
-    .catch(next);
+    .catch(
+      error=> {
+        const message= error.message.includes('Path') ? "Please fill all fields!" :
+        error.message.split(': ')[error.message.split(': ').length-1];
+        const isAuth =  !!req.user
+        const options = selectOptionsRender(req.body.difficultyLevel)
+        res.render('update.hbs',{_id:req.params.id,...req.body,isAuth,username:req.user.username,message,options})
+      });
 }
 function getAttachAccessory(req, res, next) {
   const id = req.params.id;
@@ -122,7 +139,12 @@ function postCreateAccessory(req, res, next) {
   new AccessoryModel(data)
     .save()
     .then(() => res.redirect("/"))
-    .catch(next);
+    .catch( error=> {
+      const message= error.message.includes('Path') ? "Please fill all fields!" :
+      error.message.split(': ')[error.message.split(': ').length-1];
+      const isAuth =  !!req.user
+      res.render('createAccessory.hbs',{...req.body,isAuth,username:req.user.username,message})
+    });
 }
 
 module.exports = {
