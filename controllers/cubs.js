@@ -50,7 +50,10 @@ function getDetails(req, res, next) {
     .lean()
     .populate("accessories")
     .then((cube) => {
-        const isCreator = cube.creator === req.user.id;
+      let isCreator;
+      if( req.user ) {
+       isCreator = cube.creator === req.user.id ;
+      }
       isAuthUser(req, res, "details.hbs", {
         id: cube._id,
         ...cube,
@@ -85,7 +88,7 @@ function getUpdate(req, res, next) {
 function selectOptionsRender(difficultyLevel) {
   return [{ 1: "1 - Very Easy" }, { 2: "2 - Easy" }, { 3: "3 - Medium (Standard 3x3)" },
   { 4: "4 - Intermediate" }, { 5: "5 - Expert" }, { 6: "6 - Hardcore" }]
-    .map(x => {
+    .map(x => {qw
       x = { value: Object.keys(x)[0], info: Object.values(x)[0] };
       if (+x.value === +difficultyLevel) {
         x.selected = true;

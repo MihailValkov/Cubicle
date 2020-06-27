@@ -10,7 +10,7 @@ module.exports = (app) => {
     app.get('/logout',controllerUser.logout )
     app.get('/create',controllerUser.auth,controllerCub.getCreate )
     app.post('/create',controllerUser.auth,controllerCub.postCreate )
-    app.get('/about', controllerCub.getAbout)
+    app.get('/about',controllerUser.auth, controllerCub.getAbout)
     app.get('/details/:id',controllerUser.auth, controllerCub.getDetails)
     app.get('/delete/:id', controllerUser.auth,controllerCub.getDelete)
     app.get('/update/:id',controllerUser.auth, controllerCub.getUpdate)

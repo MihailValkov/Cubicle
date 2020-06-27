@@ -12,7 +12,7 @@ async function postRegister(req, res) {
       await UserModel.create({ username, password})
       return res.redirect("/login");
   } catch (error) {
-    const message= (error.message.split(':')[error.message.split(':').length-1]).includes('Path') ? "Please fill all fields!" :
+    const message= error.message.includes('Path') ? "Please fill all fields!" :
     error.message.split(':')[error.message.split(':').length-1];
     res.render("register.hbs",{message});
   }
@@ -48,7 +48,7 @@ function auth(req,res,next){
          req.user=user;
          return next();
      }
-     if (!token && (req.path==='/' || req.path===`/details/${req.params.id}`)){
+     if (!token && (req.path==='/' || req.path==='/about' || req.path===`/details/${req.params.id}`)){
        return next()
      }
      return res.redirect('/login')
