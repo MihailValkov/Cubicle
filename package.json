@@ -3,7 +3,7 @@
     "description": "description",
     "authors": "Mihail",
     "version": "1.0.0",
-    "main": "pathToMain",
+    "main": "index.js",
     "scripts": {
         "start": "nodemon ."
     },
